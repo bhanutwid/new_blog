@@ -21,7 +21,15 @@ class PostController extends Controller
         $post = Post::create($request->all());
         return response()->json($post, 201);
     }
-    
+    public function show($id)
+    {
+    $post = Post::find($id);
+
+    if (!$post) {
+        return response()->json(['message' => 'Post not found'], 404);
+    }
+    return response()->json($post);
+    }
     
 
 }

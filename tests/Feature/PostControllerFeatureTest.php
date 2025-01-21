@@ -29,11 +29,29 @@ class PostControllerFeatureTest extends TestCase
     $response->assertJsonFragment($data); 
     $this->assertDatabaseHas('posts', $data); 
     }
-
     public function test_it_returns_validation_errors_when_fields_are_missing()
     {
     $response = $this->postJson('/api/posts', []);
     $response->assertStatus(422); 
     $response->assertJsonValidationErrors(['title', 'content']); 
+    }
+    public function test_it_can_fetch_a_single_post()
+    {
+        $post = Post::factory()->create();
+        $response = $this->getJson("/api/posts/{$post->id}");
+        $response->assertStatus(200);
+        $response->assertJson([
+            'id' => $post->id,
+            'title' => $post->title,
+            'content' => $post->content,
+        ]);
+    }
+    public function test_it_returns_404_if_post_is_not_found()
+    {
+        $response = $this->getJson('/api/posts/999');
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'Post not found',
+        ]);
     }
 }
