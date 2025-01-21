@@ -5,10 +5,10 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Redis;
 
 
-
-class PostControllerTest extends TestCase
+class DatabaseUnitTest extends TestCase
 {   
     use RefreshDatabase;
     public function test_example(): void
@@ -38,5 +38,11 @@ class PostControllerTest extends TestCase
         $this->assertNotNull($retrievedPost);
         $this->assertEquals($post->title, $retrievedPost->title);
         $this->assertEquals($post->content, $retrievedPost->content);
+    }
+    public function testSetGetRedisValue()
+    {
+        Redis::set('test_key', 'test_value');
+        $value = Redis::get('test_key');
+        $this->assertEquals('test_value', $value);
     }
 }

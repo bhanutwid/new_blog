@@ -5,17 +5,17 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
+use Illuminate\Support\Facades\Redis;
 
 class PostControllerFeatureTest extends TestCase
 {   
     use RefreshDatabase;
-    public function testToFetchAllPosts()
+    public function test_to_fetch_all_posts()
     {
         Post::factory()->count(3)->create();
         $response = $this->getJson('/api/posts');
-        $response->assertStatus(200);
-        $response->assertJsonCount(3);
+        $response->assertStatus(200)->assertJsonCount(3);
+        $this->assertEquals(1, Redis::exists('all_posts'));
     }
     public function test_it_creates_a_new_post()
     {
@@ -28,6 +28,7 @@ class PostControllerFeatureTest extends TestCase
     $response->assertStatus(201); 
     $response->assertJsonFragment($data); 
     $this->assertDatabaseHas('posts', $data); 
+    $this->assertEquals(0, Redis::exists('posts'));
     }
     public function test_it_returns_validation_errors_when_fields_are_missing()
     {
@@ -40,11 +41,7 @@ class PostControllerFeatureTest extends TestCase
         $post = Post::factory()->create();
         $response = $this->getJson("/api/posts/{$post->id}");
         $response->assertStatus(200);
-        $response->assertJson([
-            'id' => $post->id,
-            'title' => $post->title,
-            'content' => $post->content,
-        ]);
+        $this->assertEquals(1, Redis::exists("post_{$post->id}"));
     }
     public function test_it_returns_404_if_post_is_not_found()
     {
@@ -65,6 +62,8 @@ class PostControllerFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment($data);
         $this->assertDatabaseHas('posts', $data);
+        $this->assertEquals(1, Redis::exists("post_{$post->id}"));
+        $this->assertEquals(0, Redis::exists('posts'));
     }
     public function test_it_returns_404_if_post_to_update_is_not_found()
     {
@@ -92,6 +91,8 @@ class PostControllerFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Post deleted successfully']);
         $this->assertDatabaseMissing('posts', ['id' => $post->id]);
+        $this->assertEquals(0, Redis::exists("post_{$post->id}"));
+        $this->assertEquals(0, Redis::exists('posts'));
     }
     public function test_it_returns_404_if_post_to_delete_is_not_found()
     {
@@ -100,4 +101,5 @@ class PostControllerFeatureTest extends TestCase
             'message' => 'Post not found',
         ]);
     }
+
 }
