@@ -17,4 +17,23 @@ class PostControllerFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonCount(3);
     }
+    public function test_it_creates_a_new_post()
+    {
+    $data = [
+        'title' => 'Sample Title',
+        'content' => 'Sample Content',
+    ];
+    $response = $this->postJson('/api/posts', $data);
+
+    $response->assertStatus(201); 
+    $response->assertJsonFragment($data); 
+    $this->assertDatabaseHas('posts', $data); 
+    }
+
+    public function test_it_returns_validation_errors_when_fields_are_missing()
+    {
+    $response = $this->postJson('/api/posts', []);
+    $response->assertStatus(422); 
+    $response->assertJsonValidationErrors(['title', 'content']); 
+    }
 }
