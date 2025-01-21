@@ -54,4 +54,35 @@ class PostControllerFeatureTest extends TestCase
             'message' => 'Post not found',
         ]);
     }
+    public function test_it_can_update_a_post()
+    {
+        $post = Post::factory()->create();
+        $data = [
+            'title' => 'Updated Title',
+            'content' => 'Updated Content',
+        ];
+        $response = $this->putJson("/api/posts/{$post->id}", $data);
+        $response->assertStatus(200);
+        $response->assertJsonFragment($data);
+        $this->assertDatabaseHas('posts', $data);
+    }
+    public function test_it_returns_404_if_post_to_update_is_not_found()
+    {
+        $data = [
+            'title' => 'Updated Title',
+            'content' => 'Updated Content',
+        ];
+        $response = $this->putJson('/api/posts/999', $data);
+        $response->assertStatus(404);
+        $response->assertJson([
+            'message' => 'Post not found',
+        ]);
+    }
+    public function test_it_returns_validation_errors_when_updating_post_with_invalid_data()
+    {
+        $post = Post::factory()->create();
+        $response = $this->putJson("/api/posts/{$post->id}", []);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['title', 'content']);
+    }
 }
