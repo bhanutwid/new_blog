@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Redis;
 class DatabaseUnitTest extends TestCase
 {   
     use RefreshDatabase;
-    public function test_example(): void
+    public function testExample(): void
     {
         $this->assertTrue(true);
     }
