@@ -85,4 +85,19 @@ class PostControllerFeatureTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['title', 'content']);
     }
+    public function test_it_can_delete_a_post()
+    {
+        $post = Post::factory()->create();
+        $response = $this->deleteJson("/api/posts/{$post->id}");
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Post deleted successfully']);
+        $this->assertDatabaseMissing('posts', ['id' => $post->id]);
+    }
+    public function test_it_returns_404_if_post_to_delete_is_not_found()
+    {
+        $response = $this->deleteJson('/api/posts/999');
+        $response->assertJson([
+            'message' => 'Post not found',
+        ]);
+    }
 }
