@@ -17,6 +17,8 @@ This project is a simple blog application built using Laravel. It provides RESTf
 -   Composer: 2.8.3
 -   MySQL: 9.1.0
 -   Redis-CLI: 7.2.7
+-   Docker: 27.4.0 & Docker Desktop (optional)
+-   Postman to send requests to the API (optional)
 
 ## Installation Instructions
 
@@ -62,3 +64,23 @@ This project is a simple blog application built using Laravel. It provides RESTf
       php artisan test
 
     ```
+
+## Docker Setup
+
+To run the Blog App using Docker, follow these steps:
+
+1. Build images based on the services specified in docker-compose.yml:
+
+    ```bash
+    docker-compose build
+
+    ```
+
+2. Get the docker containers up for each of the service:
+
+    ```bash
+    docker-compose up
+
+    ```
+
+3. Open the nginx container URL or go to http://localhost:8080 on your device.

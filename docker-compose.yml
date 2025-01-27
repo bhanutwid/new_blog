@@ -1,0 +1,63 @@
+
+services:
+    app:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        image: laravel-app
+        container_name: laravel-app
+        restart: unless-stopped
+        env_file:
+            - .env.docker
+        ports:
+            - "9000:80"
+        volumes:
+            - ./:/var/www 
+        depends_on:
+            - db
+            - redis
+
+    db:
+        image: mysql:8.0 
+        container_name: db
+        restart: unless-stopped
+        env_file:
+            - .env.docker
+            
+        ports:
+            - "3306:3306" 
+        volumes:
+            - db_data:/var/lib/mysql 
+            - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+        command:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+
+    redis:
+        image: redis:alpine 
+        container_name: redis-cache 
+        restart: unless-stopped
+        ports:
+            - "6379:6379" 
+        volumes:
+            - redis_data:/data 
+
+    nginx:
+        image: nginx:alpine
+        container_name: nginx-server
+        restart: unless-stopped
+        ports:
+            - "8080:80"  
+        volumes:
+            - ./:/var/www  
+            - ./nginx/conf.d:/etc/nginx/conf.d  
+        depends_on:
+            - app  
+
+volumes:
+    db_data: 
+    redis_data:
+
+networks:
+    default:
+        driver: bridge 

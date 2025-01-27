@@ -11,15 +11,11 @@ use Illuminate\Support\Facades\Redis;
 class DatabaseUnitTest extends TestCase
 {   
     use RefreshDatabase;
-    public function testExample(): void
-    {
-        $this->assertTrue(true);
-    }
-    public function testToCheckDatabaseConnection()
+    public function test_to_check_database_connection()
     {
         $this->assertTrue(DB::connection()->getDatabaseName() !== null, 'Database connection failed.');
     }
-    public function testPostModelWorkingOrNot()
+    public function test_post_model_working_or_not()
     {
         $post = Post::create([
             'title' => 'Test Post',
@@ -28,7 +24,7 @@ class DatabaseUnitTest extends TestCase
         $this->assertEquals('Test Post', $post->title);
         $this->assertEquals('This is test content.', $post->content);
     }
-    public function testCanRetrievePostsFromDatabase()
+    public function test_can_retrieve_posts_from_database()
     {
         $post = Post::create([
             'title' => 'Post in DB',
@@ -39,7 +35,7 @@ class DatabaseUnitTest extends TestCase
         $this->assertEquals($post->title, $retrievedPost->title);
         $this->assertEquals($post->content, $retrievedPost->content);
     }
-    public function testSetGetRedisValue()
+    public function test_set_get_redis_value()
     {
         Redis::set('test_key', 'test_value');
         $value = Redis::get('test_key');
